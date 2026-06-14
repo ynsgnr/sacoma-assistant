@@ -29,12 +29,13 @@ The scale exposes a single proprietary BLE service (`FFB0`) with three character
 
 ```
   scale ──FFB2/FFB3 notify──▶ session ──raw bytes──▶ sacoma.protocol (decode) ─▶ sacoma.calculations (WLA25) ─▶ sensors
-  scale ◀──FFB1 write──────── session ◀─cmd bytes─── sacoma.encoder      (optional, experimental)
+  scale ◀──FFB1 write──────── session ◀─cmd bytes─── sacoma.encoder
 ```
 
-The scale pushes its measurements to any connected client: once the integration connects
-and subscribes to `FFB2`/`FFB3`, the live weight stream and the final result (weight + 10
-segmental impedances) arrive on their own — no writes required.
+On each weigh-in the integration connects, reads the live weight until it settles, then
+replays the Fitdays app's `FFB1` sync — a sustained `BA` profile heartbeat for the selected
+user, a one-time `BB`/`BD` user sync, and `B0` acks of the scale's control frames — so the
+scale shows body composition on its own display, and decodes the `FFB3` result.
 
 The scale measures only weight and impedance, so two things happen on the integration side:
 
@@ -46,15 +47,9 @@ The scale measures only weight and impedance, so two things happen on the integr
 
 Each user gets their own device and sensor set, so household members' readings stay separate.
 
-Optionally, the integration can replay the Fitdays app's `FFB1` sync (built by
-`sacoma.encoder`) to make the scale show body composition on its own display: a sustained
-`BA` profile heartbeat carrying the selected user, a one-time `BB`/`BD` user sync, and `B0`
-acks of the scale's control frames. It's off by default and not needed to read the
-measurement — enable "Show body composition on the scale's own display" in the options.
-
 The boundary is deliberate: the **library** owns protocol (`sacoma.Session`) and the
 body-composition maths (`sacoma.compute`) and does no I/O; the **integration** owns BLE and
-user selection. One BLE conversation — read → select the user → optionally drive — lives in
+user selection. One BLE conversation — read → select the user → drive → decode — lives in
 [`session.py`](custom_components/sacoma_scale/session.py); the coordinator connects on
 advertisement, calls `sacoma.compute`, and publishes per-user state
 ([`coordinator.py`](custom_components/sacoma_scale/coordinator.py)).
@@ -78,9 +73,8 @@ directory and restart.
    is set up and an adapter is in range of the scale.
 2. Step on the scale to wake it (it only advertises while in use). It should be
    auto-discovered; otherwise add **SACOMA Smart Scale** from *Settings → Devices &
-   Services → Add Integration*.
-3. Name the scale.
-4. Add each person who uses it: a name, a **weight range** (used to auto-select them), and
+   Services → Add Integration* (manual add also lets you name the scale).
+3. Add each person who uses it: a name, a **weight range** (used to auto-select them), and
    their height, age, sex and athlete mode. Tick *Add another user* to add more.
 
 Edit the name and users later under the integration's options (the options flow re-collects

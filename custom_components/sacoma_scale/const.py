@@ -24,7 +24,6 @@ LOCAL_NAME: Final = "MY_SCALE"
 # --- Config entry keys ----------------------------------------------------------------
 CONF_ADDRESS: Final = "address"
 CONF_DEVICE_NAME: Final = "device_name"
-CONF_DRIVE: Final = "drive"          # bool -> run the FFB1 sync that drives the scale's screen
 CONF_USERS: Final = "users"          # list of user dicts (keys below)
 
 # Per-user keys. Weight range drives auto-selection; the profile feeds the WLA25 algorithm.
@@ -44,8 +43,6 @@ SEX_FEMALE: Final = "female"
 DEFAULT_HEIGHT_CM: Final = 170
 DEFAULT_AGE: Final = 30
 DEFAULT_USER_ID: Final = 0
-# Reading is passive; driving only adds the on-device body-comp screen, so it stays opt-in.
-DEFAULT_DRIVE: Final = False
 
 # --- Timing (seconds) -----------------------------------------------------------------
 # Overall budget for one connection: read the settled weight, then (when driving) publish.

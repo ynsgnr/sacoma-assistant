@@ -1,9 +1,9 @@
 """Config flow for the SACOMA smart scale.
 
-Setup runs: pick the device (auto-discovered or chosen manually) -> name it and set
-the drive option -> add one or more household users. Each user carries a weight range
-(used to auto-select who stepped on the scale) and the body profile the WLA25
-algorithm needs. The same device + user collection backs the options flow.
+Setup runs: pick the device -> name it -> add one or more household users. Each user
+carries a weight range (used to auto-select who stepped on the scale) and the body
+profile the WLA25 algorithm needs. Auto-discovery skips the name step (it uses the
+advertised name); manual add and the options flow ask for it.
 """
 from __future__ import annotations
 
@@ -29,7 +29,6 @@ from .const import (
     CONF_AGE,
     CONF_ATHLETE,
     CONF_DEVICE_NAME,
-    CONF_DRIVE,
     CONF_HEIGHT_CM,
     CONF_SEX,
     CONF_USER_ID,
@@ -38,7 +37,6 @@ from .const import (
     CONF_WEIGHT_MAX,
     CONF_WEIGHT_MIN,
     DEFAULT_AGE,
-    DEFAULT_DRIVE,
     DEFAULT_HEIGHT_CM,
     DEFAULT_USER_ID,
     DOMAIN,
@@ -57,7 +55,6 @@ def _device_schema(defaults: dict[str, Any]) -> vol.Schema:
             vol.Required(
                 CONF_DEVICE_NAME, default=defaults.get(CONF_DEVICE_NAME) or DEFAULT_TITLE
             ): str,
-            vol.Required(CONF_DRIVE, default=defaults.get(CONF_DRIVE, DEFAULT_DRIVE)): cv.boolean,
         }
     )
 
@@ -97,19 +94,17 @@ def _is_scale(info: BluetoothServiceInfoBleak) -> bool:
 
 
 class _DeviceUsersFlow:
-    """Shared device-name/drive step + multi-user 'add another' loop.
+    """Shared device-name step + multi-user 'add another' loop.
 
     Mixed into both the config and options flows; subclasses supply ``_finish`` (how
     to persist) and ``_device_defaults`` (what to pre-fill the device form with).
     """
 
     _device_name: str
-    _drive: bool
     _users: list[dict[str, Any]]
 
     def _start_collection(self) -> None:
         self._device_name = ""
-        self._drive = DEFAULT_DRIVE
         self._users = []
 
     async def async_step_device(
@@ -117,7 +112,6 @@ class _DeviceUsersFlow:
     ) -> ConfigFlowResult:
         if user_input is not None:
             self._device_name = user_input[CONF_DEVICE_NAME]
-            self._drive = user_input[CONF_DRIVE]
             return await self.async_step_add_user()
         return self.async_show_form(
             step_id="device", data_schema=_device_schema(self._device_defaults())
@@ -172,7 +166,9 @@ class SacomaConfigFlow(_DeviceUsersFlow, ConfigFlow, domain=DOMAIN):
         self._adv_name = discovery_info.name or discovery_info.address
         self.context["title_placeholders"] = {"name": self._adv_name}
         self._start_collection()
-        return await self.async_step_device()
+        # Auto-discovery uses the advertised name and goes straight to adding users.
+        self._device_name = self._adv_name
+        return await self.async_step_add_user()
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -211,7 +207,7 @@ class SacomaConfigFlow(_DeviceUsersFlow, ConfigFlow, domain=DOMAIN):
         )
 
     def _device_defaults(self) -> dict[str, Any]:
-        return {CONF_DEVICE_NAME: self._adv_name or DEFAULT_TITLE, CONF_DRIVE: DEFAULT_DRIVE}
+        return {CONF_DEVICE_NAME: self._adv_name or DEFAULT_TITLE}
 
     async def _finish(self) -> ConfigFlowResult:
         return self.async_create_entry(
@@ -219,7 +215,6 @@ class SacomaConfigFlow(_DeviceUsersFlow, ConfigFlow, domain=DOMAIN):
             data={
                 CONF_ADDRESS: self._address,
                 CONF_DEVICE_NAME: self._device_name,
-                CONF_DRIVE: self._drive,
                 CONF_USERS: self._users,
             },
         )
@@ -231,7 +226,7 @@ class SacomaConfigFlow(_DeviceUsersFlow, ConfigFlow, domain=DOMAIN):
 
 
 class SacomaOptionsFlow(_DeviceUsersFlow, OptionsFlow):
-    """Re-enter the device name, drive option and the full user list after setup."""
+    """Re-enter the device name and the full user list after setup."""
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
@@ -245,9 +240,5 @@ class SacomaOptionsFlow(_DeviceUsersFlow, OptionsFlow):
     async def _finish(self) -> ConfigFlowResult:
         return self.async_create_entry(
             title="",
-            data={
-                CONF_DEVICE_NAME: self._device_name,
-                CONF_DRIVE: self._drive,
-                CONF_USERS: self._users,
-            },
+            data={CONF_DEVICE_NAME: self._device_name, CONF_USERS: self._users},
         )

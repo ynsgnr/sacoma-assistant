@@ -48,8 +48,6 @@ class SacomaScaleCoordinator(DataUpdateCoordinator[ScaleData]):
         address: str,
         device_name: str,
         users: Sequence[ScaleUser],
-        *,
-        drive: bool = False,
     ) -> None:
         super().__init__(
             hass,
@@ -61,7 +59,6 @@ class SacomaScaleCoordinator(DataUpdateCoordinator[ScaleData]):
         self.address = address
         self.device_name = device_name
         self.users = list(users)
-        self.drive = drive
         self._unload_callbacks: list[Callable[[], None]] = []
         # Set synchronously in the advertisement callback to keep one session per weigh-in.
         self._busy = False
@@ -116,9 +113,7 @@ class SacomaScaleCoordinator(DataUpdateCoordinator[ScaleData]):
             BleakClientWithServiceCache, ble_device, self.address
         )
         try:
-            result = await ScaleSession(client, self.users, drive=self.drive).run(
-                MEASUREMENT_TIMEOUT_S
-            )
+            result = await ScaleSession(client, self.users).run(MEASUREMENT_TIMEOUT_S)
         finally:
             await client.disconnect()
 

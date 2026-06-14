@@ -7,7 +7,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryError
 from homeassistant.helpers import device_registry as dr
 
-from .const import CONF_DEVICE_NAME, CONF_DRIVE, DEFAULT_DRIVE, DOMAIN
+from .const import CONF_DEVICE_NAME, DOMAIN
 from .coordinator import SacomaScaleCoordinator
 from .users import users_from_config
 
@@ -22,7 +22,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: SacomaConfigEntry) -> bo
     if address is None:
         raise ConfigEntryError("config entry is missing the device address")
 
-    # Options override data once the user edits the device name / users / drive flag.
+    # Options override data once the user edits the device name or users.
     config = {**entry.data, **entry.options}
     address = address.upper()
     device_name = config.get(CONF_DEVICE_NAME) or entry.title or "SACOMA Smart Scale"
@@ -38,9 +38,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: SacomaConfigEntry) -> bo
         name=device_name,
     )
 
-    coordinator = SacomaScaleCoordinator(
-        hass, entry, address, device_name, users, drive=config.get(CONF_DRIVE, DEFAULT_DRIVE)
-    )
+    coordinator = SacomaScaleCoordinator(hass, entry, address, device_name, users)
     await coordinator.async_start()
     entry.runtime_data = coordinator
 
@@ -57,5 +55,5 @@ async def async_unload_entry(hass: HomeAssistant, entry: SacomaConfigEntry) -> b
 
 
 async def _async_reload_on_update(hass: HomeAssistant, entry: SacomaConfigEntry) -> None:
-    """Reload the entry when the user edits the device name, users, or drive flag."""
+    """Reload the entry when the user edits the device name or users."""
     await hass.config_entries.async_reload(entry.entry_id)

@@ -3,10 +3,9 @@
 Protocol framing, decoding and command sequencing live in :class:`sacoma.Session`;
 this owns only the BLE transport and the orchestration, mirroring the library's
 ``scripts/ble_test.py``. Subscribe to the weight (FFB2) and result (FFB3)
-notifications, read the live weight until it settles, pick the matching user, and
-return that user with the A3 result. When ``drive`` is on, also replay the app's
-sustained ``BA``/``BB``/``BD`` sync so the scale shows body composition on its own
-display — opt-in, and not required to read the result.
+notifications, read the live weight until it settles, pick the matching user, then
+replay the app's sustained ``BA``/``BB``/``BD`` sync (with that user's profile) so the
+scale shows body composition on its own display, and return the user with the result.
 """
 from __future__ import annotations
 
@@ -40,12 +39,9 @@ _NOTIFY_UUIDS = (WEIGHT_NOTIFY_UUID, RESULT_NOTIFY_UUID)
 class ScaleSession:
     """Runs one connected weigh-in and returns the matched user + measurement."""
 
-    def __init__(
-        self, client: BleakClient, users: Sequence[ScaleUser], *, drive: bool = False
-    ) -> None:
+    def __init__(self, client: BleakClient, users: Sequence[ScaleUser]) -> None:
         self._client = client
         self._users = users
-        self._drive = drive
         self._proto = Session()
         self._live_weight = 0.0
         self._stable_weight: float | None = None
@@ -60,7 +56,7 @@ class ScaleSession:
             await self._client.start_notify(uuid, self._on_frame)
         try:
             async with asyncio.timeout(timeout):
-                await (self._drive_flow() if self._drive else self._result_event.wait())
+                await self._drive_flow()
         except TimeoutError:
             pass
         finally:
@@ -91,7 +87,7 @@ class ScaleSession:
             if measurement.is_stabilized:
                 self._stable_weight = measurement.weight_kg
 
-    # --- drive (optional): replay the app's sync so the scale shows body comp -------------
+    # --- drive: replay the app's sync so the scale shows body composition ----------------
     async def _drive_flow(self) -> None:
         weight = await self._read_settled_weight()
         user = select_user(self._users, weight) if weight else None

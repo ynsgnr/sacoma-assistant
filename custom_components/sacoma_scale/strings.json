@@ -13,8 +13,7 @@
         "title": "Name the scale",
         "description": "Give this scale a name, then add the people who use it on the next screens.",
         "data": {
-          "device_name": "Scale name",
-          "drive": "Show body composition on the scale's own display"
+          "device_name": "Scale name"
         }
       },
       "add_user": {
@@ -47,8 +46,7 @@
         "title": "Edit the scale",
         "description": "Update the scale name and options. You'll re-enter the users on the next screens.",
         "data": {
-          "device_name": "Scale name",
-          "drive": "Show body composition on the scale's own display"
+          "device_name": "Scale name"
         }
       },
       "add_user": {
