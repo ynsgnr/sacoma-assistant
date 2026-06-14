@@ -14,6 +14,10 @@ water, BMR, …) as Home Assistant sensors — **fully local, no cloud, no Fitda
 > the Home Assistant wiring around it; weight and impedance work today, and the rest of the
 > sensors light up as the library lands them.
 
+## Supported devices
+
+- [SACOMA oplaadbaar 8-sensoren personenweegschaal (8-electrode body-analysis scale with handle)](https://www.bol.com/nl/nl/p/sacoma-oplaadbaar-8-sensoren-personenweegschaal-28x-lichaamsanalyse-slimme-weegschaal-met-handvat-vetpercentage-digitaal-met-app-usb/9300000188113948/)
+
 ## How it works
 
 The scale exposes a single proprietary BLE service (`FFB0`) with three characteristics:
