@@ -1,0 +1,92 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "user": {
+        "title": "SACOMA Smart Scale",
+        "description": "Step on the scale to wake it, then select it below. If it isn't recognised automatically, every nearby Bluetooth device is listed — pick yours by its advertised name.",
+        "data": {
+          "address": "Device"
+        }
+      },
+      "device": {
+        "title": "Name the scale",
+        "description": "Give this scale a name, then add the people who use it on the next screens.",
+        "data": {
+          "device_name": "Scale name",
+          "drive": "Show body composition on the scale's own display"
+        }
+      },
+      "add_user": {
+        "title": "Add user {index}",
+        "description": "Each reading is matched to a user by weight, then their height, age and sex turn the measured impedance into body-fat, muscle and the rest.",
+        "data": {
+          "name": "Name",
+          "weight_min": "Minimum weight (kg)",
+          "weight_max": "Maximum weight (kg)",
+          "height_cm": "Height (cm)",
+          "age": "Age",
+          "sex": "Sex",
+          "athlete": "Athlete mode",
+          "user_id": "Scale account id (optional, for the display)",
+          "add_another": "Add another user"
+        }
+      }
+    },
+    "error": {
+      "invalid_weight_range": "Minimum weight must be below maximum weight."
+    },
+    "abort": {
+      "already_configured": "This scale is already configured.",
+      "no_devices_found": "No Bluetooth devices found nearby. Step on the scale to wake it and try again."
+    }
+  },
+  "options": {
+    "step": {
+      "device": {
+        "title": "Edit the scale",
+        "description": "Update the scale name and options. You'll re-enter the users on the next screens.",
+        "data": {
+          "device_name": "Scale name",
+          "drive": "Show body composition on the scale's own display"
+        }
+      },
+      "add_user": {
+        "title": "User {index}",
+        "data": {
+          "name": "Name",
+          "weight_min": "Minimum weight (kg)",
+          "weight_max": "Maximum weight (kg)",
+          "height_cm": "Height (cm)",
+          "age": "Age",
+          "sex": "Sex",
+          "athlete": "Athlete mode",
+          "user_id": "Scale account id (optional, for the display)",
+          "add_another": "Add another user"
+        }
+      }
+    },
+    "error": {
+      "invalid_weight_range": "Minimum weight must be below maximum weight."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "weight": { "name": "Weight" },
+      "bmi": { "name": "BMI" },
+      "body_fat": { "name": "Body fat" },
+      "subcutaneous_fat": { "name": "Subcutaneous fat" },
+      "visceral_fat": { "name": "Visceral fat" },
+      "muscle": { "name": "Muscle" },
+      "skeletal_muscle": { "name": "Skeletal muscle" },
+      "body_water": { "name": "Body water" },
+      "protein": { "name": "Protein" },
+      "bone_mass": { "name": "Bone mass" },
+      "bmr": { "name": "Basal metabolic rate" },
+      "metabolic_age": { "name": "Metabolic age" },
+      "body_score": { "name": "Body score" },
+      "whr": { "name": "Waist-to-hip ratio" },
+      "impedance": { "name": "Impedance" }
+    }
+  }
+}
