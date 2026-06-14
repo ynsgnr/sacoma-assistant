@@ -8,10 +8,10 @@ It listens over Bluetooth for the scale to wake up when you step on it, reads th
 measurement, and exposes weight plus the full body composition (BMI, body-fat %, muscle,
 water, BMR, …) as Home Assistant sensors — **fully local, no cloud, no Fitdays account.**
 
-> **Status: early.** The decoding and body-composition maths live in the
-> [`sacoma-lib`](https://github.com/ynsgnr/sacoma-lib) library (on PyPI as `sacoma-lib`,
-> imported as `sacoma`); this repo is the Home Assistant wiring around it. It's young and
-> not yet widely tested on hardware — feedback welcome.
+> **Status: beta.** Working on real hardware, but young and not yet widely tested across
+> setups — expect rough edges, and please report issues. The decoding and body-composition
+> maths live in the [`sacoma-lib`](https://github.com/ynsgnr/sacoma-lib) library (on PyPI as
+> `sacoma-lib`, imported as `sacoma`); this repo is the Home Assistant wiring around it.
 
 ## Supported devices
 
