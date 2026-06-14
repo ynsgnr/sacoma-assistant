@@ -10,12 +10,7 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
     SensorStateClass,
 )
-from homeassistant.const import (
-    PERCENTAGE,
-    UnitOfElectricResistance,
-    UnitOfMass,
-    UnitOfTime,
-)
+from homeassistant.const import PERCENTAGE, UnitOfMass, UnitOfTime
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
@@ -153,7 +148,7 @@ SENSORS: tuple[SacomaSensorDescription, ...] = (
     SacomaSensorDescription(
         key="impedance",
         translation_key="impedance",
-        native_unit_of_measurement=UnitOfElectricResistance.OHM,
+        native_unit_of_measurement="Ω",
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
         value_fn=lambda s: s.measurement.impedance,
