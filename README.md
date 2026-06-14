@@ -8,11 +8,10 @@ It listens over Bluetooth for the scale to wake up when you step on it, reads th
 measurement, and exposes weight plus the full body composition (BMI, body-fat %, muscle,
 water, BMR, …) as Home Assistant sensors — **fully local, no cloud, no Fitdays account.**
 
-> **Status: scaffolding / work in progress.** The decoding and body-composition maths live
-> in the separate [`sacoma`](https://github.com/ynsgnr/sacoma-lib) library, which is still
-> being finished (the WLA25 algorithm and command encoding are in progress). This repo is
-> the Home Assistant wiring around it; weight and impedance work today, and the rest of the
-> sensors light up as the library lands them.
+> **Status: early.** The decoding and body-composition maths live in the
+> [`sacoma-lib`](https://github.com/ynsgnr/sacoma-lib) library (on PyPI as `sacoma-lib`,
+> imported as `sacoma`); this repo is the Home Assistant wiring around it. It's young and
+> not yet widely tested on hardware — feedback welcome.
 
 ## Supported devices
 
@@ -104,12 +103,12 @@ a reading lands; the body-composition sensors fill in when `sacoma` can compute 
 
 ```bash
 pip install -e ".[dev]"
-pip install -e ../sacoma-lib      # the decode/compute library (until published to PyPI)
+pip install sacoma-lib==0.1.0     # the decode/compute library (imported as `sacoma`)
 pytest
 ```
 
-`tests/test_manifest.py` runs standalone; the decode-pipeline tests need the `sacoma`
-library importable; full flow tests use `pytest-homeassistant-custom-component`.
+`tests/test_manifest.py` runs standalone; the decode-pipeline tests need `sacoma`
+importable; full flow tests use `pytest-homeassistant-custom-component`.
 
 ## License
 

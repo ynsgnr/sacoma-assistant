@@ -34,9 +34,10 @@ def test_manifest_bluetooth_matcher() -> None:
     assert any(m.get("local_name") and m.get("connectable") for m in matchers)
 
 
-def test_manifest_requires_sacoma() -> None:
+def test_manifest_requires_sacoma_lib() -> None:
+    # PyPI distribution is "sacoma-lib"; the import name is "sacoma".
     manifest = _load(COMPONENT / "manifest.json")
-    assert any(req.startswith("sacoma==") for req in manifest["requirements"])
+    assert any(req.startswith("sacoma-lib==") for req in manifest["requirements"])
 
 
 def test_hacs_metadata() -> None:
